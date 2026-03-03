@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест: Какой вы оппонент в суде</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 900px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 60px;
+      padding: 3rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3), 0 10px 20px -5px rgba(0, 77, 153, 0.2);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 450;
+      color: #13294B;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .subhead {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin-bottom: 2.5rem;
+      background: rgba(0, 105, 180, 0.07);
+      padding: 0.7rem 1.8rem;
+      border-radius: 60px;
+      display: inline-block;
+      width: auto;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .test-progress {
+      width: 100%;
+      height: 8px;
+      background: #d4e0ec;
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1E4A7A;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 20px;
+    }
+
+    .question-container {
+      margin-bottom: 2.5rem;
+    }
+
+    .question-number {
+      font-size: 1.2rem;
+      color: #1E4A7A;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .question-text {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: #13294B;
+      margin-bottom: 1.8rem;
+    }
+
+    .answers-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .answer-option {
+      background: #f0f5fc;
+      border: 1.5px solid rgba(0, 77, 153, 0.2);
+      border-radius: 40px;
+      padding: 1.2rem 1.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .answer-option:hover {
+      border-color: #1E4A7A;
+      background: #e3edf9;
+      transform: translateX(5px);
+    }
+
+    .answer-option.selected {
+      border-color: #1E4A7A;
+      background: #d4e4fa;
+      box-shadow: 0 5px 15px rgba(26, 67, 113, 0.2);
+    }
+
+    .answer-marker {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #1E4A7A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .answer-option.selected .answer-marker::after {
+      content: "✓";
+      color: #1E4A7A;
+      font-weight: bold;
+    }
+
+    .answer-text {
+      font-size: 1.1rem;
+      color: #13294B;
+      flex: 1;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .nav-button {
+      background: transparent;
+      border: 1.5px solid #1E4A7A;
+      color: #13294B;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-button:hover:not(:disabled) {
+      background: #1E4A7A;
+      color: white;
+    }
+
+    .nav-button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: #99b3cc;
+    }
+
+    /* Результат */
+    .result-container {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .result-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 10px 15px rgba(26, 67, 113, 0.3));
+    }
+
+    .result-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #13294B;
+      margin-bottom: 1rem;
+    }
+
+    .result-badge {
+      background: #1E4A7A;
+      color: white;
+      padding: 0.5rem 2rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-description {
+      background: #f0f5fc;
+      border-radius: 40px;
+      padding: 2rem;
+      text-align: left;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #13294B;
+      border-left: 8px solid #1E4A7A;
+      margin-bottom: 2rem;
+    }
+
+    .result-weakness {
+      background: #fee9e7;
+      border-radius: 30px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 8px solid #B22222;
+      color: #5a1e1e;
+    }
+
+    .restart-button {
+      background: #1E4A7A;
+      border: none;
+      color: white;
+      padding: 1rem 3rem;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #0d2f4f;
+    }
+
+    .restart-button:hover {
+      background: #13294B;
+      transform: scale(1.02);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #4a5a6a;
+      text-align: center;
+      border-top: 1px dashed #1E4A7A;
+      padding-top: 1.2rem;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 2rem; }
+      h1 { font-size: 2.2rem; }
+      .question-text { font-size: 1.2rem; }
+      .answer-text { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>⚖️ Какой вы оппонент в суде</h1>
+    <div class="subhead">Ответьте на 8 вопросов — узнайте свой архетип</div>
+
+    <!-- Прогресс -->
+    <div class="test-progress">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Контейнер для вопросов -->
+    <div id="quizContainer">
+      <div class="question-container">
+        <div class="question-number" id="questionNumber">Вопрос 1/8</div>
+        <div class="question-text" id="questionText">Загрузка...</div>
+      </div>
+
+      <div class="answers-grid" id="answersContainer"></div>
+
+      <div class="nav-buttons">
+        <button class="nav-button" id="prevBtn" disabled>← Назад</button>
+        <button class="nav-button" id="nextBtn">Далее →</button>
+      </div>
+    </div>
+
+    <!-- Контейнер для результата (изначально скрыт) -->
+    <div id="resultContainer" class="result-container hidden"></div>
+
+    <div class="footer">
+      на основе типологии судебных юристов
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Данные теста (полностью идентичны, только цвета изменены)
+      const questions = [
+        {
+          text: "Как вы обычно готовитесь к судебному заседанию?",
+          answers: [
+            { text: "Строю детальную логическую цепочку, анализирую все возможные контраргументы", weights: { analyst: 3, universal: 1 } },
+            { text: "Продумываю психологическое давление на оппонента, готовлю провокационные вопросы", weights: { confront: 3, emotional: 1 } },
+            { text: "Стараюсь понять, что важно для судьи, готовлю яркие образы и нарратив", weights: { emotional: 3, universal: 1 } },
+            { text: "Оцениваю перспективы урегулирования, ищу точки соприкосновения", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Проверяю все процессуальные сроки и формальности, доверенности, извещения", weights: { procedural: 3, analyst: 1 } },
+            { text: "Анализирую сразу всё: и право, и психологию, и процессуальные нюансы", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Какой стиль общения в суде вам ближе?",
+          answers: [
+            { text: "Спокойный, безэмоциональный, только факты и нормы права", weights: { analyst: 3, procedural: 1 } },
+            { text: "Напористый, жёсткий, могу использовать менторский тон", weights: { confront: 3 } },
+            { text: "Эмоциональный, создаю истории, апеллирую к справедливости", weights: { emotional: 3, diplomat: 1 } },
+            { text: "Конструктивный диалог, готовность к компромиссам", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Акцентирую внимание на процедурных моментах и сроках", weights: { procedural: 3, confront: 1 } },
+            { text: "Гибко подстраиваюсь под стиль оппонента и судьи", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Что для вас важнее всего в судебном процессе?",
+          answers: [
+            { text: "Идеально выстроенная логическая конструкция", weights: { analyst: 3, procedural: 1 } },
+            { text: "Победа любой ценой, демонстрация превосходства", weights: { confront: 3 } },
+            { text: "Создание правильного эмоционального впечатления", weights: { emotional: 3, diplomat: 1 } },
+            { text: "Достижение оптимального для клиента результата, даже через компромисс", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Соблюдение всех процессуальных формальностей", weights: { procedural: 3, analyst: 1 } },
+            { text: "Комплексный подход: и победа, и результат, и процедура", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Как вы реагируете на неожиданный поворот в процессе?",
+          answers: [
+            { text: "Быстро просчитываю новые варианты, остаюсь хладнокровным", weights: { analyst: 2, universal: 2 } },
+            { text: "Усиливаю давление, пытаюсь перехватить инициативу", weights: { confront: 3, emotional: 1 } },
+            { text: "Использую эмоциональный интеллект, чтобы перестроить нарратив", weights: { emotional: 3, diplomat: 1 } },
+            { text: "Предлагаю оппоненту вернуться к переговорам", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Проверяю, не нарушена ли процедура, ищу процессуальные ошибки оппонента", weights: { procedural: 3, confront: 1 } },
+            { text: "Мгновенно адаптирую тактику под новые обстоятельства", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Как к вам относятся коллеги и клиенты?",
+          answers: [
+            { text: "Считают надёжным, но немного сухим и занудным", weights: { analyst: 3, procedural: 1 } },
+            { text: "Побаиваются вашего напора, считают опасным оппонентом", weights: { confront: 3 } },
+            { text: "Ценят за умение расположить к себе и найти общий язык", weights: { emotional: 2, diplomat: 2 } },
+            { text: "Уважают за мудрость и умение договариваться", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Считают педантом, но признают, что с вами не страшно идти в суд", weights: { procedural: 3, analyst: 1 } },
+            { text: "Восхищаются вашей универсальностью и способностью решать любые задачи", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Какая ваша главная профессиональная гордость?",
+          answers: [
+            { text: "Сложные дела, где всё построено на логике и документах", weights: { analyst: 3, procedural: 1 } },
+            { text: "Дела, где я смог подавить оппонента и добиться победы", weights: { confront: 3 } },
+            { text: "Истории, где удалось тронуть сердце судьи и выиграть вопреки фактам", weights: { emotional: 3 } },
+            { text: "Крупные мировые соглашения, спасшие отношения сторон", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Отмены решений вышестоящими инстанциями из-за процессуальных нарушений", weights: { procedural: 3 } },
+            { text: "Любые сложные задачи, где требуется нестандартный подход", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Что вас больше всего раздражает в оппоненте?",
+          answers: [
+            { text: "Эмоциональные выпады вместо логики", weights: { analyst: 2, procedural: 2 } },
+            { text: "Слабость и нерешительность", weights: { confront: 3 } },
+            { text: "Сухость и бездушие, отсутствие человеческого подхода", weights: { emotional: 3 } },
+            { text: "Нежелание идти на компромисс", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Нарушение процессуальных норм и халатность", weights: { procedural: 3, analyst: 1 } },
+            { text: "Предсказуемость и шаблонность мышления", weights: { universal: 3 } }
+          ]
+        },
+        {
+          text: "Какую тактику вы чаще всего применяете?",
+          answers: [
+            { text: "Выстраиваю многоходовые комбинации заранее", weights: { analyst: 3, universal: 1 } },
+            { text: "Давлю на оппонента, ищу его слабые места", weights: { confront: 3, emotional: 1 } },
+            { text: "Создаю нужную атмосферу, располагаю к себе", weights: { emotional: 3, diplomat: 1 } },
+            { text: "Постепенно подвожу стороны к мировому соглашению", weights: { diplomat: 3, analyst: 1 } },
+            { text: "Ловлю на процессуальных ошибках", weights: { procedural: 3, confront: 1 } },
+            { text: "Миксую разные тактики в зависимости от ситуации", weights: { universal: 3 } }
+          ]
+        }
+      ];
+
+      // Типажи (без стратегии)
+      const archetypes = {
+        analyst: {
+          name: "Аналитик-стратег",
+          icon: "🧮",
+          description: "Вы — мастер тщательной подготовки и глубокого анализа. Расчетливы, хладнокровны, воспринимаете судебный процесс как сложную шахматную партию. Ваша сила — в безупречно выстроенной логической цепочке, подкрепленной документами, и предвидении возможных контраргументов. Суд уважает вашу основательность, а клиенты ценят надёжность, хотя иногда считают вас суховатым.",
+          weakness: "Ваша главная слабость — сфокусированность на логике в ущерб эмоциональному воздействию. В глазах суда вы можете выглядеть как «сухарь», что особенно критично в спорах, где важна человеческая составляющая. Скрупулезность иногда мешает быстро адаптироваться к неожиданным поворотам."
+        },
+        confront: {
+          name: "Конфронтатор",
+          icon: "⚔️",
+          description: "Вы видите в процессе прежде всего противоборство и считаете, что единственный достойный исход — победа любой ценой. Вы напористы, агрессивны в рамках процессуальных норм и часто обладаете сильной харизмой. Ваше главное оружие — психологическое давление и умение использовать слабые стороны оппонента.",
+          weakness: "Агрессия часто приводит к стратегическим ошибкам. Вы можете увлечься и «передавить», вызвав обратную реакцию суда. Судья нередко неосознанно начинает защищать другую сторону. Увлекшись противостоянием, вы можете упустить выгодное мировое соглашение."
+        },
+        emotional: {
+          name: "Эмоциональный игрок",
+          icon: "🎭",
+          description: "В вашей работе много от психолога-наблюдателя. Вы внимательны к деталям, умеете устанавливать контакт, анализируете невербальные сигналы. Вы создаёте яркие, запоминающиеся образы, выстраивая точный и убедительный нарратив. Сильны в делах, где ключевую роль играет человеческое восприятие.",
+          weakness: "Ваша сила обращается против вас, когда дело сводится к строгим формальным требованиям и неоспоримым документам. Вы можете упускать процессуальные детали. Ваш красивый рассказ может противоречить документам — это главная уязвимость."
+        },
+        diplomat: {
+          name: "Дипломат-переговорщик",
+          icon: "🤝",
+          description: "Вы исходите из принципа, что разумный компромисс предпочтительнее затяжного конфликта. Вы уравновешены, рациональны, прагматичны, обладаете большим жизненным опытом. Ваша цель — не формальная победа, а достижение оптимального для клиента результата с учётом экономической целесообразности.",
+          weakness: "Ваши мирные инициативы на начальном этапе часто воспринимаются беспринципным оппонентом как признак слабости. В ситуации, где принципиально важна судебная победа как прецедент, ваш подход может быть неэффективен."
+        },
+        procedural: {
+          name: "Процессуалист",
+          icon: "📋",
+          description: "Вы дотошны и ориентированы на формальные требования. Ваше оружие — процессуальные тонкости: сроки, регламенты, формальности. Вы часто выигрываете споры, находя малейшие ошибки в действиях противоположной стороны. Судьи с высокой нагрузкой относятся к вам без энтузиазма, но вынуждены реагировать на формально безупречные требования.",
+          weakness: "Главный недостаток — невозможность подняться над проектом и увидеть его целиком. Погружаясь в мелочи, вы часто упускаете стратегическую картину дела и слабо работаете с доказательствами по существу."
+        },
+        universal: {
+          name: "Универсал",
+          icon: "🔮",
+          description: "Вы — самый сложный оппонент, синтез лучших качеств других типажей. Вы гибко подстраиваете тактику под конкретного судью, учитывая слабые места противоположной стороны и специфику дела. Вы одинаково убедительны в письменных позициях и в устных выступлениях, можете быть жёстким и конструктивным. Вас сразу видно.",
+          weakness: "Выраженных слабостей нет. Однако вас может быть мало в силу высокого уровня мастерства. Возможна перегруженность делами или недостаточно глубокое знание узкоспециализированной отрасли."
+        }
+      };
+
+      let currentQuestion = 0;
+      let answers = new Array(questions.length).fill(null); // индексы выбранных ответов
+
+      // Элементы DOM
+      const quizContainer = document.getElementById('quizContainer');
+      const resultContainer = document.getElementById('resultContainer');
+      const progressFill = document.getElementById('progressFill');
+      const questionNumber = document.getElementById('questionNumber');
+      const questionText = document.getElementById('questionText');
+      const answersContainer = document.getElementById('answersContainer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      // Функция обновления отображения вопроса
+      function renderQuestion() {
+        const q = questions[currentQuestion];
+        questionNumber.textContent = `Вопрос ${currentQuestion + 1}/${questions.length}`;
+        questionText.textContent = q.text;
+
+        let html = '';
+        q.answers.forEach((answer, index) => {
+          const isSelected = answers[currentQuestion] === index;
+          html += `
+            <div class="answer-option ${isSelected ? 'selected' : ''}" data-q="${currentQuestion}" data-a="${index}">
+              <div class="answer-marker"></div>
+              <div class="answer-text">${answer.text}</div>
+            </div>
+          `;
+        });
+        answersContainer.innerHTML = html;
+
+        // Добавляем обработчики
+        document.querySelectorAll('.answer-option').forEach(el => {
+          el.addEventListener('click', () => {
+            const qIdx = parseInt(el.dataset.q);
+            const aIdx = parseInt(el.dataset.a);
+            answers[qIdx] = aIdx;
+            // Снимаем выделение со всех в этом вопросе
+            document.querySelectorAll(`.answer-option[data-q="${qIdx}"]`).forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            // Выделяем выбранный
+            el.classList.add('selected');
+            // Обновляем прогресс
+            updateProgress();
+          });
+        });
+
+        // Обновляем кнопки
+        prevBtn.disabled = currentQuestion === 0;
+        if (currentQuestion === questions.length - 1) {
+          nextBtn.textContent = 'Завершить';
+        } else {
+          nextBtn.textContent = 'Далее →';
+        }
+
+        updateProgress();
+      }
+
+      // Функция обновления прогресс-бара
+      function updateProgress() {
+        const answeredCount = answers.filter(a => a !== null).length;
+        const percent = (answeredCount / questions.length) * 100;
+        progressFill.style.width = percent + '%';
+      }
+
+      // Функция подсчёта результата
+      function calculateResult() {
+        const scores = {
+          analyst: 0,
+          confront: 0,
+          emotional: 0,
+          diplomat: 0,
+          procedural: 0,
+          universal: 0
+        };
+
+        for (let i = 0; i < questions.length; i++) {
+          const answerIdx = answers[i];
+          if (answerIdx === null) continue;
+          const weights = questions[i].answers[answerIdx].weights;
+          for (let [type, value] of Object.entries(weights)) {
+            scores[type] += value;
+          }
+        }
+
+        // Находим типаж с максимальным счётом
+        let maxType = 'analyst';
+        let maxScore = 0;
+        for (let [type, score] of Object.entries(scores)) {
+          if (score > maxScore) {
+            maxScore = score;
+            maxType = type;
+          }
+        }
+
+        return maxType;
+      }
+
+      // Функция отображения результата
+      function showResult() {
+        const type = calculateResult();
+        const ar = archetypes[type];
+
+        quizContainer.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+
+        resultContainer.innerHTML = `
+          <div class="result-icon">${ar.icon}</div>
+          <div class="result-title">${ar.name}</div>
+          <div class="result-badge">ваш архетип</div>
+          <div class="result-description">${ar.description}</div>
+          <div class="result-weakness">
+            <strong>⚠️ Слабая сторона:</strong> ${ar.weakness}
+          </div>
+          <button class="restart-button" id="restartBtn">Пройти заново</button>
+        `;
+
+        document.getElementById('restartBtn').addEventListener('click', restartTest);
+      }
+
+      // Функция перезапуска
+      function restartTest() {
+        currentQuestion = 0;
+        answers = new Array(questions.length).fill(null);
+        quizContainer.classList.remove('hidden');
+        resultContainer.classList.add('hidden');
+        renderQuestion();
+      }
+
+      // Обработчики кнопок
+      prevBtn.addEventListener('click', () => {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          renderQuestion();
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentQuestion === questions.length - 1) {
+          // Завершение
+          showResult();
+        } else {
+          currentQuestion++;
+          renderQuestion();
+        }
+      });
+
+      // Инициализация
+      renderQuestion();
+    })();
+  </script>
+</body>
+</html>
