@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажёр: контраргументы на доводы ответчика</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 1000px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 60px;
+      padding: 3rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3), 0 10px 20px -5px rgba(0, 77, 153, 0.2);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 450;
+      color: #13294B;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .subhead {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      background: rgba(0, 105, 180, 0.07);
+      padding: 0.7rem 1.8rem;
+      border-radius: 60px;
+      display: inline-block;
+      width: auto;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    /* Таблица доводов */
+    .arguments-table {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .argument-card {
+      background: #f0f5fc;
+      border-radius: 40px;
+      padding: 1.5rem 2rem;
+      border: 1px solid rgba(0, 77, 153, 0.2);
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .argument-card:hover {
+      border-color: #1E4A7A;
+      background: #e3edf9;
+      transform: translateX(5px);
+    }
+
+    .argument-card.active {
+      border-color: #1E4A7A;
+      background: #d4e4fa;
+      box-shadow: 0 10px 25px -10px #1E4A7A;
+    }
+
+    .argument-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .argument-icon {
+      width: 40px;
+      height: 40px;
+      background: #1E4A7A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .argument-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #13294B;
+      flex: 1;
+    }
+
+    .argument-arrow {
+      font-size: 1.5rem;
+      color: #1E4A7A;
+      opacity: 0.5;
+      transition: 0.2s;
+    }
+
+    .argument-card.active .argument-arrow {
+      opacity: 1;
+      transform: rotate(90deg);
+    }
+
+    .counter-content {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px dashed #1E4A7A;
+      display: none;
+    }
+
+    .argument-card.active .counter-content {
+      display: block;
+    }
+
+    .counter-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1E4A7A;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .counter-text {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #13294B;
+      background: white;
+      padding: 1.2rem 1.5rem;
+      border-radius: 30px;
+      border-left: 6px solid #1E4A7A;
+    }
+
+    .counter-law {
+      font-size: 0.9rem;
+      color: #4a5a6a;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .footnote {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #4a5a6a;
+      text-align: center;
+      border-top: 1px dashed #1E4A7A;
+      padding-top: 1.2rem;
+    }
+
+    .instruction {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1E4A7A;
+      font-weight: 500;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 2rem; }
+      h1 { font-size: 2rem; }
+      .argument-title { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🛡️ Тренажёр: контраргументы на доводы ответчика</h1>
+    <div class="subhead">Выберите довод — узнайте, как на него реагировать</div>
+
+    <div class="instruction">👇 Нажмите на любой довод, чтобы увидеть контраргумент</div>
+
+    <!-- Таблица доводов -->
+    <div class="arguments-table" id="argumentsTable">
+      <!-- Довод 1: Ключевая ставка -->
+      <div class="argument-card" data-id="1">
+        <div class="argument-header">
+          <div class="argument-icon">1</div>
+          <div class="argument-title">«Неустойка превышает ключевую ставку»</div>
+          <div class="argument-arrow">▶</div>
+        </div>
+        <div class="counter-content">
+          <div class="counter-title">💬 Ваш контраргумент</div>
+          <div class="counter-text">
+            Превышение размера неустойки над ключевой ставкой не свидетельствует о несоразмерности (п. 2 информационного письма Президиума ВАС № 17). Сам по себе высокий процент не является основанием для снижения.
+          </div>
+          <div class="counter-law">п. 2 информационного письма Президиума ВАС от 14.07.1997 № 17</div>
+        </div>
+      </div>
+
+      <!-- Довод 2: Отсутствие убытков -->
+      <div class="argument-card" data-id="2">
+        <div class="argument-header">
+          <div class="argument-icon">2</div>
+          <div class="argument-title">«У кредитора нет убытков»</div>
+          <div class="argument-arrow">▶</div>
+        </div>
+        <div class="counter-content">
+          <div class="counter-title">💬 Ваш контраргумент</div>
+          <div class="counter-text">
+            Отсутствие убытков не имеет значения (п. 1 ст. 330 ГК, п. 73 постановления Пленума ВС № 7). Для взыскания неустойки достаточно факта нарушения обязательства.
+          </div>
+          <div class="counter-law">п. 1 ст. 330 ГК РФ, п. 73 Пленума ВС № 7 от 24.03.2016</div>
+        </div>
+      </div>
+
+      <!-- Довод 3: На общую сумму контракта -->
+      <div class="argument-card" data-id="3">
+        <div class="argument-header">
+          <div class="argument-icon">3</div>
+          <div class="argument-title">«Неустойка начислена на общую сумму контракта»</div>
+          <div class="argument-arrow">▶</div>
+        </div>
+        <div class="counter-content">
+          <div class="counter-title">💬 Ваш контраргумент</div>
+          <div class="counter-text">
+            Если договором предусмотрено начисление неустойки на общую цену, это условие обязательно для сторон (ст. 421 ГК). Риск наступления ответственности ответчик должен был оценить при заключении договора.
+          </div>
+          <div class="counter-law">ст. 421 ГК РФ (свобода договора)</div>
+        </div>
+      </div>
+
+      <!-- Довод 4: Тяжелое финансовое положение -->
+      <div class="argument-card" data-id="4">
+        <div class="argument-header">
+          <div class="argument-icon">4</div>
+          <div class="argument-title">«Ответчик находится в тяжелом финансовом положении»</div>
+          <div class="argument-arrow">▶</div>
+        </div>
+        <div class="counter-content">
+          <div class="counter-title">💬 Ваш контраргумент</div>
+          <div class="counter-text">
+            Тяжелое финансовое положение не является основанием для снижения неустойки (п. 73 Пленума ВС № 7). Это предпринимательский риск.
+          </div>
+          <div class="counter-law">п. 73 Пленума ВС № 7 от 24.03.2016</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      на основе ст. 330 ГК РФ, п. 73 Пленума ВС № 7, информационного письма Президиума ВАС № 17
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Элементы
+      const argumentCards = document.querySelectorAll('.argument-card');
+
+      // Открытие/закрытие карточек (аккордеон)
+      argumentCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+          // Закрываем все другие
+          argumentCards.forEach(c => {
+            if (c !== this) {
+              c.classList.remove('active');
+            }
+          });
+          
+          // Открываем/закрываем текущий
+          this.classList.toggle('active');
+        });
+      });
+
+      // По умолчанию все карточки закрыты — ничего не показываем
+      // (это и так работает, так как active нигде не установлен)
+    })();
+  </script>
+</body>
+</html>
