@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор риска снижения неустойки</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 1100px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 60px;
+      padding: 3rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3), 0 10px 20px -5px rgba(0, 77, 153, 0.2);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 450;
+      color: #13294B;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Сетка: параметры и результат */
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Левая панель с параметрами */
+    .params-panel {
+      background: #f0f5fc;
+      border-radius: 48px;
+      padding: 2rem;
+      border: 1px solid rgba(0, 77, 153, 0.2);
+    }
+
+    .param-item {
+      margin-bottom: 2rem;
+      border-bottom: 1px dashed rgba(0, 77, 153, 0.2);
+      padding-bottom: 1.5rem;
+    }
+
+    .param-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+
+    .param-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #13294B;
+    }
+
+    .param-value {
+      background: #1E4A7A;
+      color: white;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* Стили для селектов */
+    .param-select {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      background-color: white;
+      border: 1.5px solid #1E4A7A;
+      border-radius: 40px;
+      font-size: 1rem;
+      color: #13294B;
+      font-weight: 400;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231E4A7A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 1.2rem center;
+      background-size: 1.2rem;
+    }
+
+    .param-select:hover {
+      border-color: #0d3a5c;
+    }
+
+    /* Стили для радио-кнопок */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      color: #13294B;
+    }
+
+    .radio-option input[type="radio"] {
+      appearance: none;
+      width: 1.2rem;
+      height: 1.2rem;
+      border: 2px solid #1E4A7A;
+      border-radius: 50%;
+      outline: none;
+      transition: 0.1s;
+      background-color: white;
+    }
+
+    .radio-option input[type="radio"]:checked {
+      background-color: #1E4A7A;
+      box-shadow: inset 0 0 0 4px white;
+    }
+
+    .radio-option input[type="radio"]:hover {
+      border-color: #0d3a5c;
+    }
+
+    /* Правая панель — результат */
+    .result-panel {
+      background: #ffffff;
+      border-radius: 48px;
+      padding: 2rem;
+      border: 1px solid #1E4A7A;
+      box-shadow: 0 20px 30px -10px rgba(26, 67, 113, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .risk-meter {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .risk-percent {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #13294B;
+      line-height: 1;
+    }
+
+    .risk-label {
+      font-size: 1.3rem;
+      color: #2c3e50;
+      margin-top: 0.5rem;
+    }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 0.5rem 2rem;
+      border-radius: 40px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+
+    .badge-low {
+      background: #2E7D32;
+      color: white;
+    }
+
+    .badge-medium {
+      background: #F1C40F;
+      color: #13294B;
+    }
+
+    .badge-high {
+      background: #C62828;
+      color: white;
+    }
+
+    .indicators-list {
+      background: #f0f5fc;
+      border-radius: 30px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .indicator-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px dashed rgba(0, 77, 153, 0.2);
+    }
+
+    .indicator-item:last-child {
+      border-bottom: none;
+    }
+
+    .indicator-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-green { background-color: #2E7D32; }
+    .dot-yellow { background-color: #F1C40F; }
+    .dot-red { background-color: #C62828; }
+
+    .indicator-text {
+      flex: 1;
+      color: #13294B;
+    }
+
+    .footnote {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #4a5a6a;
+      text-align: center;
+      border-top: 1px dashed #1E4A7A;
+      padding-top: 1.2rem;
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+
+    @media (max-width: 800px) {
+      .calculator-grid { grid-template-columns: 1fr; }
+      .card { padding: 2rem; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🛡️ Калькулятор риска снижения неустойки</h1>
+
+    <div class="calculator-grid">
+      <!-- Левая панель: параметры -->
+      <div class="params-panel">
+        <!-- 1. Процент неустойки -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">📈 Процент неустойки</span>
+            <span class="param-value" id="percentValue">0.1%</span>
+          </div>
+          <select class="param-select" id="percentSelect">
+            <option value="0.1">0.1% за каждый день (стандарт)</option>
+            <option value="0.3">0.3% за каждый день</option>
+            <option value="0.5">0.5% за каждый день</option>
+            <option value="1.0">1% за каждый день</option>
+            <option value="other">Более 1% (повышенная)</option>
+          </select>
+        </div>
+
+        <!-- 2. Привязка к ключевой ставке ЦБ -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">🏦 Привязка к ключевой ставке ЦБ</span>
+            <span class="param-value" id="keyRateValue">Нет</span>
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="keyRate" value="none" checked> Нет
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="keyRate" value="double"> Двукратная ставка
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. Верхний предел неустойки -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">📊 Верхний предел неустойки</span>
+            <span class="param-value" id="limitValue">Есть (10%)</span>
+          </div>
+          <select class="param-select" id="limitSelect">
+            <option value="10">Есть, 10% от суммы долга</option>
+            <option value="20">Есть, 20% от суммы долга</option>
+            <option value="30">Есть, 30% от суммы долга</option>
+            <option value="none">Нет верхнего предела</option>
+          </select>
+        </div>
+
+        <!-- 4. Зеркальность условий -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">⚖️ Зеркальность условий</span>
+            <span class="param-value" id="mirrorValue">Равные</span>
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="mirror" value="equal" checked> Равные для обеих сторон
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="mirror" value="unequal"> Неравные
+            </label>
+          </div>
+        </div>
+
+        <!-- 5. Оговорка о разумности -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">📝 Оговорка о признании разумности</span>
+            <span class="param-value" id="reasonValue">Есть</span>
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="reason" value="yes" checked> Есть
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="reason" value="no"> Нет
+            </label>
+          </div>
+        </div>
+
+        <!-- 6. Тип поставки (поэтапность) -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">📦 Тип исполнения</span>
+            <span class="param-value" id="stageValue">Поэтапное</span>
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="stages" value="stage" checked> Поэтапное (неустойка на этап)
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="stages" value="total"> Единовременное (на общую сумму)
+            </label>
+          </div>
+        </div>
+
+        <!-- 7. Прогрессивная шкала -->
+        <div class="param-item">
+          <div class="param-header">
+            <span class="param-title">📈 Прогрессивная шкала</span>
+            <span class="param-value" id="progressiveValue">Нет</span>
+          </div>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="progressive" value="yes"> Да (увеличивается со временем)
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="progressive" value="no" checked> Нет
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Правая панель: результат -->
+      <div class="result-panel">
+        <div class="risk-meter">
+          <div class="risk-percent" id="riskPercent">12%</div>
+          <div class="risk-label">вероятность снижения</div>
+          <div class="risk-badge" id="riskBadge">Низкий риск</div>
+        </div>
+
+        <div class="indicators-list" id="indicatorsList">
+          <!-- будут заполняться динамически -->
+        </div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot dot-green"></span> Низкий риск</div>
+          <div class="legend-item"><span class="legend-dot dot-yellow"></span> Средний риск</div>
+          <div class="legend-item"><span class="legend-dot dot-red"></span> Высокий риск</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      на основе судебной практики: постановления АС Северо-Западного округа от 06.09.2023 № А56-67995/2022, 
+      АС Уральского округа от 13.01.2023 № А07-3648/2021, определения ВС от 21.12.2023 № А40-69663/2017 и др.
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Получаем все элементы
+      const percentSelect = document.getElementById('percentSelect');
+      const keyRateRadios = document.querySelectorAll('input[name="keyRate"]');
+      const limitSelect = document.getElementById('limitSelect');
+      const mirrorRadios = document.querySelectorAll('input[name="mirror"]');
+      const reasonRadios = document.querySelectorAll('input[name="reason"]');
+      const stagesRadios = document.querySelectorAll('input[name="stages"]');
+      const progressiveRadios = document.querySelectorAll('input[name="progressive"]');
+
+      // Элементы отображения значений
+      const percentValue = document.getElementById('percentValue');
+      const keyRateValue = document.getElementById('keyRateValue');
+      const limitValue = document.getElementById('limitValue');
+      const mirrorValue = document.getElementById('mirrorValue');
+      const reasonValue = document.getElementById('reasonValue');
+      const stageValue = document.getElementById('stageValue');
+      const progressiveValue = document.getElementById('progressiveValue');
+
+      // Элементы результата
+      const riskPercent = document.getElementById('riskPercent');
+      const riskBadge = document.getElementById('riskBadge');
+      const indicatorsList = document.getElementById('indicatorsList');
+
+      // Функция получения выбранного значения радио
+      function getRadioValue(radios) {
+        for (let r of radios) if (r.checked) return r.value;
+        return null;
+      }
+
+      // Функция обновления отображаемых значений
+      function updateDisplayValues() {
+        // Процент
+        const percent = percentSelect.value;
+        if (percent === '0.1') percentValue.textContent = '0.1%';
+        else if (percent === '0.3') percentValue.textContent = '0.3%';
+        else if (percent === '0.5') percentValue.textContent = '0.5%';
+        else if (percent === '1.0') percentValue.textContent = '1%';
+        else percentValue.textContent = '>1%';
+
+        // Ключевая ставка
+        const keyRate = getRadioValue(keyRateRadios);
+        if (keyRate === 'none') keyRateValue.textContent = 'Нет';
+        else if (keyRate === 'double') keyRateValue.textContent = 'Двукратная';
+
+        // Верхний предел
+        const limit = limitSelect.value;
+        if (limit === 'none') limitValue.textContent = 'Нет';
+        else limitValue.textContent = `Есть (${limit}%)`;
+
+        // Зеркальность
+        const mirror = getRadioValue(mirrorRadios);
+        mirrorValue.textContent = mirror === 'equal' ? 'Равные' : 'Неравные';
+
+        // Оговорка
+        const reason = getRadioValue(reasonRadios);
+        reasonValue.textContent = reason === 'yes' ? 'Есть' : 'Нет';
+
+        // Этапность
+        const stages = getRadioValue(stagesRadios);
+        stageValue.textContent = stages === 'stage' ? 'Поэтапное' : 'На общую сумму';
+
+        // Прогрессивная
+        const progressive = getRadioValue(progressiveRadios);
+        progressiveValue.textContent = progressive === 'yes' ? 'Да' : 'Нет';
+      }
+
+      // Функция расчёта риска (УВЕЛИЧЕННЫЕ РИСКИ)
+      function calculateRisk() {
+        const percent = percentSelect.value;
+        const keyRate = getRadioValue(keyRateRadios);
+        const limit = limitSelect.value;
+        const mirror = getRadioValue(mirrorRadios);
+        const reason = getRadioValue(reasonRadios);
+        const stages = getRadioValue(stagesRadios);
+        const progressive = getRadioValue(progressiveRadios);
+
+        let totalRisk = 0;
+        const indicators = [];
+
+        // 1. Процент неустойки
+        if (percent === '0.1') {
+          indicators.push({ text: 'Процент неустойки 0,1% (стандарт)', color: 'green' });
+        } else if (percent === '0.3') {
+          totalRisk += 25; // было 20
+          indicators.push({ text: 'Процент неустойки 0,3% (повышенный)', color: 'yellow' });
+        } else if (percent === '0.5') {
+          totalRisk += 35; // было 30
+          indicators.push({ text: 'Процент неустойки 0,5% (высокий)', color: 'red' });
+        } else if (percent === '1.0') {
+          totalRisk += 45; // было 40
+          indicators.push({ text: 'Процент неустойки 1% (очень высокий)', color: 'red' });
+        } else {
+          totalRisk += 55; // было 50
+          indicators.push({ text: 'Процент неустойки более 1% (экстремальный)', color: 'red' });
+        }
+
+        // 2. Ключевая ставка
+        if (keyRate === 'double') {
+          totalRisk -= 10; // оставил как есть (это защита)
+          indicators.push({ text: 'Привязка к двукратной ключевой ставке', color: 'green' });
+        }
+
+        // 3. Верхний предел
+        if (limit !== 'none') {
+          totalRisk -= 15; // защита
+          indicators.push({ text: `Установлен верхний предел (${limit}%)`, color: 'green' });
+        } else {
+          totalRisk += 10; // было 0, добавил риск
+          indicators.push({ text: 'Нет верхнего предела', color: 'yellow' });
+        }
+
+        // 4. Зеркальность
+        if (mirror === 'equal') {
+          totalRisk -= 10; // защита
+          indicators.push({ text: 'Равные условия ответственности для сторон', color: 'green' });
+        } else {
+          totalRisk += 25; // было 20
+          indicators.push({ text: 'Неравные условия ответственности', color: 'red' });
+        }
+
+        // 5. Оговорка о разумности
+        if (reason === 'yes') {
+          totalRisk -= 15; // защита
+          indicators.push({ text: 'Оговорка о признании разумности неустойки', color: 'green' });
+        } else {
+          totalRisk += 15; // было 0, добавил риск
+          indicators.push({ text: 'Нет оговорки о разумности', color: 'yellow' });
+        }
+
+        // 6. Тип исполнения
+        if (stages === 'stage') {
+          totalRisk -= 5; // защита
+          indicators.push({ text: 'Неустойка начисляется на стоимость этапа', color: 'green' });
+        } else {
+          totalRisk += 20; // было 15
+          indicators.push({ text: 'Неустойка начисляется на общую сумму договора', color: 'red' });
+        }
+
+        // 7. Прогрессивная шкала
+        if (progressive === 'yes') {
+          totalRisk -= 15; // защита
+          indicators.push({ text: 'Прогрессивная шкала неустойки', color: 'green' });
+        } else {
+          totalRisk += 10; // было 0, добавил риск за отсутствие прогрессии
+          indicators.push({ text: 'Нет прогрессивной шкалы', color: 'yellow' });
+        }
+
+        // Ограничиваем риск от 0 до 100
+        totalRisk = Math.max(0, Math.min(100, totalRisk));
+
+        // Определяем категорию риска
+        let riskCategory, badgeClass;
+        if (totalRisk <= 25) {
+          riskCategory = 'Низкий риск';
+          badgeClass = 'badge-low';
+        } else if (totalRisk <= 50) {
+          riskCategory = 'Средний риск';
+          badgeClass = 'badge-medium';
+        } else {
+          riskCategory = 'Высокий риск';
+          badgeClass = 'badge-high';
+        }
+
+        // Обновляем отображение
+        riskPercent.textContent = totalRisk + '%';
+        riskBadge.textContent = riskCategory;
+        riskBadge.className = 'risk-badge ' + badgeClass;
+
+        // Отрисовываем индикаторы
+        let indicatorsHtml = '';
+        indicators.forEach(ind => {
+          let dotClass = ind.color === 'green' ? 'dot-green' : (ind.color === 'yellow' ? 'dot-yellow' : 'dot-red');
+          indicatorsHtml += `
+            <div class="indicator-item">
+              <div class="indicator-dot ${dotClass}"></div>
+              <div class="indicator-text">${ind.text}</div>
+            </div>
+          `;
+        });
+        indicatorsList.innerHTML = indicatorsHtml;
+      }
+
+      // Обновление всех значений и расчёт
+      function updateAll() {
+        updateDisplayValues();
+        calculateRisk();
+      }
+
+      // Добавляем обработчики событий
+      percentSelect.addEventListener('change', updateAll);
+      limitSelect.addEventListener('change', updateAll);
+      
+      keyRateRadios.forEach(r => r.addEventListener('change', updateAll));
+      mirrorRadios.forEach(r => r.addEventListener('change', updateAll));
+      reasonRadios.forEach(r => r.addEventListener('change', updateAll));
+      stagesRadios.forEach(r => r.addEventListener('change', updateAll));
+      progressiveRadios.forEach(r => r.addEventListener('change', updateAll));
+
+      // Инициализация
+      updateAll();
+    })();
+  </script>
+</body>
+</html>
