@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Defender: Неустойка</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    body {
+      background: #1a2b3c;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+    }
+
+    .game-container {
+      max-width: 1000px;
+      width: 100%;
+      background: #2a4a5a;
+      border: 8px solid #0f1f2f;
+      padding: 1.5rem;
+      box-shadow: 15px 15px 0 #0a1a2a;
+    }
+
+    .game-header {
+      background: #1d3b4b;
+      border: 4px solid #0f1f2f;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #b3f0ff;
+      text-shadow: 3px 3px 0 #0a1a2a;
+      font-size: 0.8rem;
+    }
+
+    .lives {
+      display: flex;
+      gap: 0.8rem;
+      background: #0f1f2f;
+      padding: 0.8rem 1.5rem;
+      border: 2px solid #4a7a8a;
+    }
+
+    .heart {
+      width: 24px;
+      height: 24px;
+      background: #ff6b6b;
+      border: 2px solid #ffd7d7;
+      transform: rotate(45deg);
+      position: relative;
+      box-shadow: 3px 3px 0 #4a1a1a;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      background: #ff6b6b;
+      border: 2px solid #ffd7d7;
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: 3px 3px 0 #4a1a1a;
+    }
+
+    .heart::before {
+      left: -12px;
+      top: 0;
+    }
+
+    .heart::after {
+      top: -12px;
+      left: 0;
+    }
+
+    .heart.dead {
+      background: #4a4a4a;
+      border-color: #2a2a2a;
+      box-shadow: 3px 3px 0 #1a1a1a;
+    }
+
+    .heart.dead::before,
+    .heart.dead::after {
+      background: #4a4a4a;
+      border-color: #2a2a2a;
+    }
+
+    .score-box {
+      background: #0f1f2f;
+      padding: 0.8rem 1.5rem;
+      border: 4px solid #4a7a8a;
+      color: #b3f0ff;
+    }
+
+    .arena {
+      background: #3a6a7a;
+      border: 6px solid #1f4a5a;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: inset 0 0 0 4px #2a5a6a;
+    }
+
+    .pixel-char {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .plaintiff {
+      background: #2d7a4a;
+      border: 4px solid #1f5a3a;
+      padding: 1rem 2rem;
+      color: #b3ffb3;
+      text-shadow: 3px 3px 0 #1f5a3a;
+      font-size: 0.9rem;
+      text-align: center;
+      box-shadow: 8px 8px 0 #1f5a3a;
+    }
+
+    .vs {
+      font-size: 2rem;
+      color: #ffb347;
+      text-shadow: 5px 5px 0 #b35f1f;
+      transform: rotate(-10deg);
+    }
+
+    .defendant {
+      background: #b35f5f;
+      border: 4px solid #7a3f3f;
+      padding: 1rem 2rem;
+      color: #ffb3b3;
+      text-shadow: 3px 3px 0 #7a3f3f;
+      font-size: 0.9rem;
+      text-align: center;
+      box-shadow: 8px 8px 0 #7a3f3f;
+    }
+
+    .attack-bubble {
+      background: #0f1f2f;
+      border: 4px solid #ffb347;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      color: #ffb347;
+      text-align: center;
+      font-size: 1rem;
+      line-height: 1.5;
+      position: relative;
+      box-shadow: 6px 6px 0 #0a1a2a;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .attack-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      right: 30px;
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 20px solid #ffb347;
+      filter: drop-shadow(4px 4px 0 #0a1a2a);
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 20px;
+      background: #1d3b4b;
+      border: 4px solid #0f1f2f;
+      margin: 1.5rem 0;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      background: #b3ffb3;
+      width: 100%;
+      transition: width 0.1s linear;
+      box-shadow: inset 0 0 10px #4aff4a;
+    }
+
+    .arguments-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .argument-btn {
+      background: #1d3b4b;
+      border: 4px solid #4a7a8a;
+      padding: 1.5rem 1rem;
+      color: #b3f0ff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.65rem;
+      line-height: 1.6;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 6px 6px 0 #0f1f2f;
+      transition: all 0.05s linear;
+      word-break: break-word;
+      min-height: 120px;
+    }
+
+    .argument-btn:hover:not(:disabled) {
+      background: #2d5a6a;
+      border-color: #b3f0ff;
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0 #0f1f2f;
+    }
+
+    .argument-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: 4px 4px 0 #0f1f2f;
+    }
+
+    .argument-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: #4a4a4a;
+    }
+
+    .game-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+    }
+
+    .game-overlay.active {
+      visibility: visible;
+    }
+
+    .game-message {
+      background: #0f1f2f;
+      border: 8px solid #ffb347;
+      padding: 3rem 4rem;
+      text-align: center;
+      color: #ffb347;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 2rem;
+      line-height: 1.5;
+      box-shadow: 20px 20px 0 #0a1a2a;
+      max-width: 600px;
+    }
+
+    .win-message {
+      border-color: #b3ffb3;
+      color: #b3ffb3;
+    }
+
+    .game-message small {
+      font-size: 1rem;
+      color: #b3f0ff;
+      display: block;
+      margin-top: 2rem;
+      cursor: pointer;
+    }
+
+    .game-message small:hover {
+      color: #ffb347;
+    }
+
+    .pixel-hint {
+      color: #b3f0ff;
+      text-align: center;
+      font-size: 0.7rem;
+      margin-top: 1rem;
+      text-shadow: 2px 2px 0 #0a1a2a;
+    }
+
+    @media (max-width: 700px) {
+      .arguments-grid {
+        grid-template-columns: 1fr;
+      }
+      .game-message {
+        font-size: 1.2rem;
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <div class="game-header">
+      <div class="lives" id="lives">
+        <div class="heart"></div>
+      </div>
+      <div class="score-box">
+        <span id="scoreDisplay">ВОПРОС 1/4</span>
+      </div>
+    </div>
+
+    <div class="arena">
+      <div class="pixel-char">
+        <div class="plaintiff">
+          ⚔️ ИСТЕЦ<br>КРЕДИТОР
+        </div>
+        <div class="vs">VS</div>
+        <div class="defendant">
+          👹 ОТВЕТЧИК<br>ДОЛЖНИК
+        </div>
+      </div>
+
+      <div class="attack-bubble" id="attackBubble">
+        🔥 Ответчик атакует...
+      </div>
+
+      <div class="timer-bar">
+        <div class="timer-fill" id="timerFill"></div>
+      </div>
+    </div>
+
+    <div class="arguments-grid" id="argumentsGrid">
+      <button class="argument-btn" data-id="1">
+        Превышение размера неустойки над ключевой ставкой не свидетельствует о несоразмерности (п. 2 инф. письма Президиума ВАС № 17). Сам по себе высокий процент не является основанием для снижения.
+      </button>
+      <button class="argument-btn" data-id="2">
+        Отсутствие убытков не имеет значения (п. 1 ст. 330 ГК, п. 73 Пленума ВС № 7). Для взыскания неустойки достаточно факта нарушения обязательства.
+      </button>
+      <button class="argument-btn" data-id="3">
+        Если договором предусмотрено начисление неустойки на общую цену, это условие обязательно для сторон (ст. 421 ГК). Риск ответственности ответчик должен был оценить при заключении договора.
+      </button>
+      <button class="argument-btn" data-id="4">
+        Тяжелое финансовое положение не является основанием для снижения неустойки (п. 73 Пленума ВС № 7). Это предпринимательский риск.
+      </button>
+    </div>
+
+    <div class="pixel-hint">
+      ⚡ У тебя 20 секунд, чтобы выбрать правильный контраргумент! ⚡
+    </div>
+  </div>
+
+  <div class="game-overlay" id="gameOverlay">
+    <div class="game-message" id="gameMessage">
+      ⚖️ СУД СНИЗИЛ НЕУСТОЙКУ ⚖️
+      <small id="restartBtn">[ НАЖМИ ЧТОБЫ НАЧАТЬ ЗАНОВО ]</small>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // 4 уникальных вопроса
+      const questions = [
+        { 
+          id: 1, 
+          text: '🔥 "Неустойка превышает ключевую ставку!"', 
+          correctId: 1
+        },
+        { 
+          id: 2, 
+          text: '💢 "У кредитора нет убытков!"', 
+          correctId: 2
+        },
+        { 
+          id: 3, 
+          text: '⚡ "Неустойка начислена на общую сумму контракта!"', 
+          correctId: 3
+        },
+        { 
+          id: 4, 
+          text: '😫 "Ответчик в тяжелом финансовом положении!"', 
+          correctId: 4
+        }
+      ];
+
+      let remainingQuestions = [];
+      let currentQuestion = null;
+      let lives = 1; // Одна жизнь
+      let timerInterval = null;
+      let timeLeft = 20; // 20 секунд
+      let canSelect = false;
+      let correctAnswers = 0; // Счетчик правильных ответов
+
+      const livesElements = document.querySelectorAll('.heart');
+      const attackBubble = document.getElementById('attackBubble');
+      const timerFill = document.getElementById('timerFill');
+      const argumentBtns = document.querySelectorAll('.argument-btn');
+      const gameOverlay = document.getElementById('gameOverlay');
+      const gameMessage = document.getElementById('gameMessage');
+      const restartBtn = document.getElementById('restartBtn');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+
+      function updateLives() {
+        livesElements.forEach((heart, index) => {
+          if (index < lives) {
+            heart.classList.remove('dead');
+          } else {
+            heart.classList.add('dead');
+          }
+        });
+      }
+
+      function stopTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+      }
+
+      function startTimer() {
+        stopTimer();
+        timeLeft = 20;
+        timerFill.style.width = '100%';
+        canSelect = true;
+
+        timerInterval = setInterval(() => {
+          timeLeft -= 0.1;
+          const percent = (timeLeft / 20) * 100;
+          timerFill.style.width = Math.max(0, percent) + '%';
+
+          if (timeLeft <= 0) {
+            // Время вышло - проигрыш
+            stopTimer();
+            canSelect = false;
+            argumentBtns.forEach(btn => btn.disabled = true);
+            
+            gameMessage.innerHTML = '⚖️ СУД СНИЗИЛ НЕУСТОЙКУ ⚖️<small id="restartBtn">[ НАЖМИ ЧТОБЫ НАЧАТЬ ЗАНОВО ]</small>';
+            gameMessage.classList.remove('win-message');
+            gameOverlay.classList.add('active');
+            document.getElementById('restartBtn').addEventListener('click', resetGame);
+          }
+        }, 100);
+      }
+
+      function nextQuestion() {
+        if (remainingQuestions.length === 0) {
+          // Все вопросы закончились - проверяем, все ли ответы правильные
+          if (correctAnswers === 4) {
+            // Победа!
+            gameMessage.innerHTML = '🏆 ВЫ ВЫИГРАЛИ ДЕЛО! 🏆<small id="restartBtn">[ НАЖМИ ЧТОБЫ НАЧАТЬ ЗАНОВО ]</small>';
+            gameMessage.classList.add('win-message');
+            gameOverlay.classList.add('active');
+            document.getElementById('restartBtn').addEventListener('click', resetGame);
+          }
+          return;
+        }
+
+        // Выбираем случайный вопрос из оставшихся
+        const randomIndex = Math.floor(Math.random() * remainingQuestions.length);
+        currentQuestion = remainingQuestions[randomIndex];
+        
+        // Удаляем его из массива, чтобы не повторялся
+        remainingQuestions.splice(randomIndex, 1);
+        
+        // Обновляем отображение
+        attackBubble.textContent = currentQuestion.text;
+        scoreDisplay.textContent = `ВОПРОС ${4 - remainingQuestions.length}/4`;
+        
+        argumentBtns.forEach(btn => {
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.borderColor = '';
+        });
+        
+        canSelect = true;
+        startTimer();
+      }
+
+      function handleArgumentClick(btn) {
+        if (!canSelect || !currentQuestion) return;
+        
+        const selectedId = parseInt(btn.dataset.id);
+        
+        canSelect = false;
+        stopTimer();
+        argumentBtns.forEach(b => b.disabled = true);
+        
+        if (selectedId === currentQuestion.correctId) {
+          // Правильный ответ
+          correctAnswers++;
+          btn.style.background = '#4a9a6a';
+          btn.style.borderColor = '#b3ffb3';
+          attackBubble.textContent = '✅ ВЕРНО!';
+          
+          // Проверяем, не ответили ли на все вопросы
+          if (remainingQuestions.length === 0 && correctAnswers === 4) {
+            // Победа!
+            setTimeout(() => {
+              gameMessage.innerHTML = '🏆 ВЫ ВЫИГРАЛИ ДЕЛО! 🏆<small id="restartBtn">[ НАЖМИ ЧТОБЫ НАЧАТЬ ЗАНОВО ]</small>';
+              gameMessage.classList.add('win-message');
+              gameOverlay.classList.add('active');
+              document.getElementById('restartBtn').addEventListener('click', resetGame);
+            }, 800);
+          } else {
+            // Следующий вопрос
+            setTimeout(() => {
+              argumentBtns.forEach(b => {
+                b.style.background = '';
+                b.style.borderColor = '';
+              });
+              nextQuestion();
+            }, 800);
+          }
+        } else {
+          // Неправильный ответ - мгновенный проигрыш
+          btn.style.background = '#b35f5f';
+          btn.style.borderColor = '#ff6b6b';
+          attackBubble.textContent = '❌ НЕВЕРНО!';
+          
+          // Жизнь всего одна, так что сразу проигрыш
+          lives = 0;
+          updateLives();
+          
+          setTimeout(() => {
+            gameMessage.innerHTML = '⚖️ СУД СНИЗИЛ НЕУСТОЙКУ ⚖️<small id="restartBtn">[ НАЖМИ ЧТОБЫ НАЧАТЬ ЗАНОВО ]</small>';
+            gameMessage.classList.remove('win-message');
+            gameOverlay.classList.add('active');
+            document.getElementById('restartBtn').addEventListener('click', resetGame);
+          }, 800);
+        }
+      }
+
+      function resetGame() {
+        // Сбрасываем все параметры
+        remainingQuestions = [...questions];
+        currentQuestion = null;
+        lives = 1;
+        correctAnswers = 0;
+        updateLives();
+        scoreDisplay.textContent = 'ВОПРОС 1/4';
+        gameOverlay.classList.remove('active');
+        
+        argumentBtns.forEach(btn => {
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.borderColor = '';
+        });
+        
+        stopTimer();
+        nextQuestion();
+      }
+
+      argumentBtns.forEach(btn => {
+        btn.addEventListener('click', () => handleArgumentClick(btn));
+      });
+
+      restartBtn.addEventListener('click', resetGame);
+
+      resetGame();
+    })();
+  </script>
+</body>
+</html>
