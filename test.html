@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест: Как защитить неустойку от снижения (3 уровня)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 900px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 60px;
+      padding: 3rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3), 0 10px 20px -5px rgba(0, 77, 153, 0.2);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 450;
+      color: #13294B;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .difficulty-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .difficulty-btn {
+      background: #f0f5fc;
+      border: 2px solid #1E4A7A;
+      color: #13294B;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .difficulty-btn:hover {
+      background: #1E4A7A;
+      color: white;
+    }
+
+    .difficulty-btn.active {
+      background: #1E4A7A;
+      color: white;
+      box-shadow: 0 5px 15px rgba(26, 67, 113, 0.4);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #e0e8f0;
+      border-radius: 20px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #1E4A7A;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .question-counter {
+      text-align: right;
+      color: #1E4A7A;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .question-container {
+      background: #f0f5fc;
+      border-radius: 40px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .question-text {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #13294B;
+      margin-bottom: 1.5rem;
+    }
+
+    .answers-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .answer-option {
+      background: white;
+      border: 2px solid rgba(0, 77, 153, 0.2);
+      border-radius: 30px;
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .answer-option:hover {
+      border-color: #1E4A7A;
+      background: #e3edf9;
+      transform: translateX(5px);
+    }
+
+    .answer-option.selected {
+      border-color: #1E4A7A;
+      background: #d4e4fa;
+      box-shadow: 0 5px 15px rgba(26, 67, 113, 0.2);
+    }
+
+    .answer-marker {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #1E4A7A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .answer-option.selected .answer-marker::after {
+      content: "✓";
+      color: #1E4A7A;
+      font-weight: bold;
+    }
+
+    .answer-text {
+      font-size: 1.1rem;
+      color: #13294B;
+      flex: 1;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 2px solid #1E4A7A;
+      color: #13294B;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #1E4A7A;
+      color: white;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      background: #1E4A7A;
+      color: white;
+      border: none;
+      padding: 1rem 3rem;
+      border-radius: 60px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 2rem auto 0;
+      display: block;
+      transition: 0.2s;
+    }
+
+    .submit-btn:hover {
+      background: #13294B;
+      transform: scale(1.02);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .results-container {
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #1E4A7A;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem auto;
+      font-size: 2.5rem;
+      font-weight: bold;
+      box-shadow: 0 10px 30px rgba(26, 67, 113, 0.5);
+    }
+
+    .score-label {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .level-result {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #13294B;
+      margin: 1rem 0;
+    }
+
+    .answers-review {
+      background: #f0f5fc;
+      border-radius: 40px;
+      padding: 2rem;
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .review-item {
+      padding: 1rem;
+      border-bottom: 1px dashed #1E4A7A;
+    }
+
+    .review-item:last-child {
+      border-bottom: none;
+    }
+
+    .correct-answer {
+      color: #2E7D32;
+      font-weight: 600;
+    }
+
+    .wrong-answer {
+      color: #C62828;
+      font-weight: 600;
+    }
+
+    .restart-btn {
+      background: #1E4A7A;
+      color: white;
+      border: none;
+      padding: 1rem 3rem;
+      border-radius: 60px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 2rem auto 0;
+      transition: 0.2s;
+    }
+
+    .restart-btn:hover {
+      background: #13294B;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #4a5a6a;
+      text-align: center;
+      border-top: 1px dashed #1E4A7A;
+      padding-top: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>⚖️ Тест: Как защитить неустойку от снижения</h1>
+
+    <!-- Выбор сложности -->
+    <div class="difficulty-selector" id="difficultySelector">
+      <button class="difficulty-btn active" data-level="easy">🟢 Лёгкий</button>
+      <button class="difficulty-btn" data-level="medium">🟡 Средний</button>
+      <button class="difficulty-btn" data-level="hard">🔴 Сложный</button>
+    </div>
+
+    <!-- Прогресс -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="question-counter" id="questionCounter">Вопрос 1/5</div>
+
+    <!-- Контейнер для вопросов -->
+    <div id="quizContainer">
+      <div class="question-container">
+        <div class="question-text" id="questionText">Загрузка...</div>
+        <div class="answers-grid" id="answersContainer"></div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" disabled>← Назад</button>
+        <button class="nav-btn" id="nextBtn">Далее →</button>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" disabled>Завершить тест</button>
+    </div>
+
+    <!-- Контейнер для результатов -->
+    <div id="resultContainer" class="results-container hidden"></div>
+
+    <div class="footer">
+      Выберите уровень сложности и проверьте свои знания
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // База всех вопросов (по номерам из файла, без вопроса 9)
+      const questionsDatabase = {
+        1: {
+          id: 1,
+          text: "Какой размер неустойки считается «золотым стандартом» и реже всего снижается судами?",
+          answers: [
+            { text: "0,5% за каждый день просрочки", correct: false },
+            { text: "0,1% за каждый день просрочки", correct: true },
+            { text: "Двукратная ключевая ставка ЦБ", correct: false },
+            { text: "Однократная ключевая ставка ЦБ", correct: false }
+          ],
+          explanation: "0,1% в день (36,6% годовых) — обычно принятый в деловом обороте размер, который суды реже всего снижают."
+        },
+        2: {
+          id: 2,
+          text: "В период экстраординарно высокой ключевой ставки (2022-2024 гг.) суды могут:",
+          answers: [
+            { text: "Всегда применять текущую высокую ставку", correct: false },
+            { text: "Снизить неустойку до обычных 7,5-9,5%", correct: true },
+            { text: "Отказать во взыскании неустойки полностью", correct: false },
+            { text: "Применить ставку 20%", correct: false }
+          ],
+          explanation: "Суды могут посчитать высокую ставку экстраординарной и снизить неустойку до обычных значений (постановление АС Поволжского округа от 24.04.2024 № А57-1345/2023)."
+        },
+        3: {
+          id: 3,
+          text: "До какого размера суды чаще всего снижают повышенные проценты (1%, 0,5%, 0,3%)?",
+          answers: [
+            { text: "0,01%", correct: false },
+            { text: "0,1%", correct: true },
+            { text: "0,05%", correct: false },
+            { text: "До двукратной ключевой ставки", correct: false }
+          ],
+          explanation: "Суды часто снижают повышенные проценты именно до 0,1% (постановление 13 ААС от 14.07.2023, постановление 8 ААС от 16.05.2024 и др.)."
+        },
+        6: {
+          id: 6,
+          text: "Какая опасность возникает при начислении неустойки на общую сумму договора при поэтапном исполнении?",
+          answers: [
+            { text: "Неустойка может быть признана недействительной", correct: false },
+            { text: "Суд может счесть это обогащением кредитора", correct: true },
+            { text: "Неустойка не начисляется вообще", correct: false },
+            { text: "Увеличивается срок исковой давности", correct: false }
+          ],
+          explanation: "Суд может признать это обогащением — кредитор получает неустойку за ту часть работ, которая выполнена надлежащим образом (Постановление Президиума ВАС от 15.07.2014 № 5467/14)."
+        },
+        7: {
+          id: 7,
+          text: "На ком лежит бремя доказывания несоразмерности неустойки?",
+          answers: [
+            { text: "На истце (кредиторе)", correct: false },
+            { text: "На ответчике (должнике)", correct: true },
+            { text: "На суде", correct: false },
+            { text: "На обеих сторонах поровну", correct: false }
+          ],
+          explanation: "В соответствии с п. 73 Постановления Пленума ВС № 7, бремя доказывания несоразмерности лежит на ответчике."
+        },
+        10: {
+          id: 10,
+          text: "Что делать, если суд намерен снизить неустойку?",
+          answers: [
+            { text: "Согласиться с любым снижением", correct: false },
+            { text: "Добровольно уменьшить неустойку до разумного размера", correct: true },
+            { text: "Обжаловать сразу, не дожидаясь решения", correct: false },
+            { text: "Заявить отвод судье", correct: false }
+          ],
+          explanation: "Истец может самостоятельно уменьшить неустойку (например, до двукратной ключевой ставки). Суды расценивают это как добросовестное поведение (постановление АС Московского округа от 24.04.2024 № А40-40972/2023)."
+        },
+        11: {
+          id: 11,
+          text: "Может ли суд снизить неустойку по собственной инициативе, если ответчик не заявлял об этом?",
+          answers: [
+            { text: "Да, в любом случае", correct: false },
+            { text: "Нет, для коммерческих организаций снижение допускается только по заявлению должника", correct: true },
+            { text: "Да, если сумма явно завышена", correct: false },
+            { text: "Только в суде первой инстанции", correct: false }
+          ],
+          explanation: "Для коммерческих организаций снижение неустойки допускается только по обоснованному заявлению должника (п. 71 Постановления Пленума ВС № 7)."
+        },
+        14: {
+          id: 14,
+          text: "Как суды оценивают заявление о снижении неустойки, если ответчик — профессиональный участник рынка?",
+          answers: [
+            { text: "Строже, снижение возможно только в исключительных случаях", correct: true },
+            { text: "Так же, как для любых других лиц", correct: false },
+            { text: "Всегда снижают неустойку", correct: false },
+            { text: "Не применяют ст. 333 ГК", correct: false }
+          ],
+          explanation: "Снижение неустойки для профессиональных участников допускается только в исключительных случаях (п. 73 Пленума ВС № 7)."
+        },
+        17: {
+          id: 17,
+          text: "Что обязательно должен указать суд, снижая неустойку?",
+          answers: [
+            { text: "Свое усмотрение", correct: false },
+            { text: "Конкретные мотивы: в чем выражается несоразмерность и почему снижение произведено именно до этого размера", correct: true },
+            { text: "Мнение сторон", correct: false },
+            { text: "Размер госпошлины", correct: false }
+          ],
+          explanation: "Снижение размера неустойки допустимо только при установлении явного несоответствия. Суд обязан мотивировать свое решение (п. 2 ст. 333 ГК, ч. 4 ст. 198 АПК)."
+        },
+        19: {
+          id: 19,
+          text: "Что такое прогрессивная шкала неустойки?",
+          answers: [
+            { text: "Неустойка увеличивается каждый месяц", correct: false },
+            { text: "Размер неустойки изменяется в зависимости от продолжительности просрочки", correct: true },
+            { text: "Неустойка начисляется только после 30 дней просрочки", correct: false },
+            { text: "Неустойка снижается при досрочном исполнении", correct: false }
+          ],
+          explanation: "Прогрессивная шкала — ставка растёт со временем просрочки (например, 0,1% в первый месяц, затем 0,5%)."
+        },
+        20: {
+          id: 20,
+          text: "Какую оговорку рекомендуется включить в договор для защиты неустойки?",
+          answers: [
+            { text: "«Стороны признают, что установленный размер неустойки является разумным и соразмерным»", correct: true },
+            { text: "«Неустойка может быть изменена судом»", correct: false },
+            { text: "«Стороны оставляют за собой право требовать снижения неустойки»", correct: false },
+            { text: "«Неустойка не подлежит взысканию при отсутствии убытков»", correct: false }
+          ],
+          explanation: "Оговорка о признании разумности размера неустойки помогает убедить суд не снижать её (постановление 13 ААС от 13.07.2024 № А56-122526/2023)."
+        }
+      };
+
+      // Настройки вопросов для каждого уровня (без вопроса 9)
+      const levelQuestions = {
+        easy: [1, 7, 10, 11, 20],
+        medium: [3, 6, 14, 17, 20],
+        hard: [2, 6, 11, 14, 19]
+      };
+
+      let currentLevel = 'easy';
+      let currentQuestions = [];
+      let currentQuestionIndex = 0;
+      let userAnswers = [];
+      let testCompleted = false;
+
+      // Элементы DOM
+      const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+      const progressFill = document.getElementById('progressFill');
+      const questionCounter = document.getElementById('questionCounter');
+      const quizContainer = document.getElementById('quizContainer');
+      const resultContainer = document.getElementById('resultContainer');
+      const questionText = document.getElementById('questionText');
+      const answersContainer = document.getElementById('answersContainer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Выбор сложности
+      difficultyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          difficultyBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentLevel = btn.dataset.level;
+          resetTest();
+        });
+      });
+
+      // Функция загрузки вопросов для текущего уровня
+      function loadQuestionsForLevel() {
+        const questionIds = levelQuestions[currentLevel];
+        currentQuestions = questionIds.map(id => questionsDatabase[id]);
+        userAnswers = new Array(currentQuestions.length).fill(null);
+      }
+
+      // Функция сброса теста
+      function resetTest() {
+        loadQuestionsForLevel();
+        currentQuestionIndex = 0;
+        testCompleted = false;
+        quizContainer.classList.remove('hidden');
+        resultContainer.classList.add('hidden');
+        renderQuestion();
+        updateProgress();
+        
+        // Обновляем счётчик вопросов в заголовке
+        questionCounter.textContent = `Вопрос 1/${currentQuestions.length}`;
+      }
+
+      // Функция обновления прогресса
+      function updateProgress() {
+        const answered = userAnswers.filter(a => a !== null).length;
+        const percent = (answered / currentQuestions.length) * 100;
+        progressFill.style.width = percent + '%';
+
+        // Обновление кнопки завершения
+        if (answered === currentQuestions.length) {
+          submitBtn.disabled = false;
+        } else {
+          submitBtn.disabled = true;
+        }
+      }
+
+      // Функция отображения вопроса
+      function renderQuestion() {
+        const q = currentQuestions[currentQuestionIndex];
+        questionText.textContent = q.text;
+
+        let html = '';
+        q.answers.forEach((answer, index) => {
+          const isSelected = userAnswers[currentQuestionIndex] === index;
+          html += `
+            <div class="answer-option ${isSelected ? 'selected' : ''}" data-answer-idx="${index}">
+              <div class="answer-marker"></div>
+              <div class="answer-text">${answer.text}</div>
+            </div>
+          `;
+        });
+        answersContainer.innerHTML = html;
+
+        // Добавляем обработчики
+        document.querySelectorAll('.answer-option').forEach(el => {
+          el.addEventListener('click', () => {
+            const answerIdx = parseInt(el.dataset.answerIdx);
+            userAnswers[currentQuestionIndex] = answerIdx;
+            
+            // Снимаем выделение со всех
+            document.querySelectorAll('.answer-option').forEach(opt => {
+              opt.classList.remove('selected');
+            });
+            
+            // Выделяем выбранный
+            el.classList.add('selected');
+            
+            updateProgress();
+          });
+        });
+
+        // Обновляем кнопки навигации
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.textContent = currentQuestionIndex === currentQuestions.length - 1 ? 'Завершить' : 'Далее →';
+        questionCounter.textContent = `Вопрос ${currentQuestionIndex + 1}/${currentQuestions.length}`;
+      }
+
+      // Функция подсчёта результатов
+      function calculateResults() {
+        let correctCount = 0;
+        
+        const results = currentQuestions.map((q, idx) => {
+          const userAnswerIdx = userAnswers[idx];
+          const isCorrect = userAnswerIdx !== null && q.answers[userAnswerIdx].correct;
+          
+          if (isCorrect) correctCount++;
+          
+          return {
+            question: q.text,
+            userAnswer: userAnswerIdx !== null ? q.answers[userAnswerIdx].text : 'Не отвечен',
+            correctAnswer: q.answers.find(a => a.correct).text,
+            isCorrect,
+            explanation: q.explanation
+          };
+        });
+
+        const percent = Math.round((correctCount / currentQuestions.length) * 100);
+        
+        let levelText = '';
+        if (percent >= 80) levelText = '🏆 Отличный результат!';
+        else if (percent >= 60) levelText = '📚 Хороший результат';
+        else if (percent >= 40) levelText = '📖 Средний результат';
+        else levelText = '🎓 Нужно повторить материал';
+
+        return { correctCount, total: currentQuestions.length, percent, levelText, results };
+      }
+
+      // Функция отображения результатов
+      function showResults() {
+        const results = calculateResults();
+        
+        quizContainer.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+
+        let reviewHtml = '';
+        results.results.forEach((r, idx) => {
+          reviewHtml += `
+            <div class="review-item">
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">${idx + 1}. ${r.question}</div>
+              <div style="margin-left: 1rem;">
+                <div class="${r.isCorrect ? 'correct-answer' : 'wrong-answer'}">
+                  Ваш ответ: ${r.userAnswer}
+                </div>
+                ${!r.isCorrect ? `<div class="correct-answer">Правильный ответ: ${r.correctAnswer}</div>` : ''}
+                <div style="color: #1E4A7A; margin-top: 0.5rem; font-size: 0.9rem;">💡 ${r.explanation}</div>
+              </div>
+            </div>
+          `;
+        });
+
+        resultContainer.innerHTML = `
+          <div class="score-circle">
+            ${results.percent}%
+            <div class="score-label">результат</div>
+          </div>
+          <div class="level-result">${results.levelText}</div>
+          <div style="font-size: 1.2rem; margin-bottom: 1rem;">
+            Правильных ответов: ${results.correctCount} из ${results.total}
+          </div>
+          <div class="answers-review">
+            <h3 style="margin-bottom: 1rem; color: #13294B;">Разбор ответов</h3>
+            ${reviewHtml}
+          </div>
+          <button class="restart-btn" id="restartBtn">Пройти заново</button>
+        `;
+
+        document.getElementById('restartBtn').addEventListener('click', resetTest);
+      }
+
+      // Обработчики навигации
+      prevBtn.addEventListener('click', () => {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+          renderQuestion();
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentQuestionIndex < currentQuestions.length - 1) {
+          currentQuestionIndex++;
+          renderQuestion();
+        } else {
+          // Завершение теста
+          if (userAnswers.filter(a => a !== null).length === currentQuestions.length) {
+            showResults();
+          }
+        }
+      });
+
+      submitBtn.addEventListener('click', showResults);
+
+      // Инициализация
+      resetTest();
+    })();
+  </script>
+</body>
+</html>
