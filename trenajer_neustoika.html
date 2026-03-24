@@ -234,15 +234,6 @@
       color: #13294B;
     }
 
-    .footnote {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #4a5a6a;
-      text-align: center;
-      border-top: 1px dashed #1E4A7A;
-      padding-top: 1.2rem;
-    }
-
     .legend {
       display: flex;
       gap: 1.5rem;
@@ -275,7 +266,6 @@
 
     <div class="calculator-grid">
       <div class="params-panel">
-        <!-- 1. Процент неустойки -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">📈 Процент неустойки</span>
@@ -290,7 +280,6 @@
           </select>
         </div>
 
-        <!-- 2. Привязка к ключевой ставке ЦБ -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">🏦 Привязка к ключевой ставке ЦБ</span>
@@ -306,7 +295,6 @@
           </div>
         </div>
 
-        <!-- 3. Верхний предел неустойки -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">📊 Верхний предел неустойки</span>
@@ -320,7 +308,6 @@
           </select>
         </div>
 
-        <!-- 4. Зеркальность условий -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">⚖️ Зеркальность условий</span>
@@ -336,7 +323,6 @@
           </div>
         </div>
 
-        <!-- 5. Оговорка о разумности -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">📝 Оговорка о признании разумности</span>
@@ -352,7 +338,6 @@
           </div>
         </div>
 
-        <!-- 6. Тип поставки (поэтапность) -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">📦 Тип исполнения</span>
@@ -368,7 +353,6 @@
           </div>
         </div>
 
-        <!-- 7. Прогрессивная шкала -->
         <div class="param-item">
           <div class="param-header">
             <span class="param-title">📈 Прогрессивная шкала</span>
@@ -387,7 +371,7 @@
 
       <div class="result-panel">
         <div class="risk-meter">
-          <div class="risk-percent" id="riskPercent">12%</div>
+          <div class="risk-percent" id="riskPercent">1%</div>
           <div class="risk-label">вероятность снижения</div>
           <div class="risk-badge" id="riskBadge">Низкий риск</div>
         </div>
@@ -400,11 +384,6 @@
           <div class="legend-item"><span class="legend-dot dot-red"></span> Высокий риск</div>
         </div>
       </div>
-    </div>
-
-    <div class="footnote">
-      на основе судебной практики: постановления АС Северо-Западного округа от 06.09.2023 № А56-67995/2022, 
-      АС Уральского округа от 13.01.2023 № А07-3648/2021, определения ВС от 21.12.2023 № А40-69663/2017 и др.
     </div>
   </div>
 
@@ -464,6 +443,15 @@
         progressiveValue.textContent = progressive === 'yes' ? 'Да' : 'Нет';
       }
 
+      function clampRisk(value) {
+        return Math.max(1, Math.min(99, Math.round(value)));
+      }
+
+      function isPercentAboveStandard() {
+        const percent = percentSelect.value;
+        return percent !== '0.1';
+      }
+
       function calculateRisk() {
         const percent = percentSelect.value;
         const keyRate = getRadioValue(keyRateRadios);
@@ -472,13 +460,15 @@
         const reason = getRadioValue(reasonRadios);
         const stages = getRadioValue(stagesRadios);
         const progressive = getRadioValue(progressiveRadios);
+        
+        const aboveStandard = isPercentAboveStandard();
 
         let totalRisk = 0;
         const indicators = [];
 
-        // 1. Процент неустойки (увеличена базовая угроза)
+        // 1. Процент неустойки
         if (percent === '0.1') {
-          totalRisk += 10; // даже 0,1% — не гарантия
+          totalRisk += 10;
           indicators.push({ text: 'Процент неустойки 0,1% (стандарт)', color: 'green' });
         } else if (percent === '0.3') {
           totalRisk += 35;
@@ -494,13 +484,13 @@
           indicators.push({ text: 'Процент неустойки более 1% (экстремальный)', color: 'red' });
         }
 
-        // 2. Ключевая ставка (защита, но не панацея)
+        // 2. Ключевая ставка
         if (keyRate === 'double') {
           totalRisk -= 10;
           indicators.push({ text: 'Привязка к двукратной ключевой ставке', color: 'green' });
         }
 
-        // 3. Верхний предел (защита)
+        // 3. Верхний предел
         if (limit !== 'none') {
           totalRisk -= 15;
           indicators.push({ text: `Установлен верхний предел (${limit}%)`, color: 'green' });
@@ -527,7 +517,7 @@
           indicators.push({ text: 'Нет оговорки о разумности', color: 'yellow' });
         }
 
-        // 6. Тип исполнения — критически важный фактор (по просьбе: риск на общую сумму 40%)
+        // 6. Тип исполнения
         if (stages === 'stage') {
           totalRisk -= 5;
           indicators.push({ text: 'Неустойка начисляется на стоимость этапа', color: 'green' });
@@ -536,16 +526,25 @@
           indicators.push({ text: 'Неустойка начисляется на общую сумму договора (высокий риск признания обогащением)', color: 'red' });
         }
 
-        // 7. Прогрессивная шкала
-        if (progressive === 'yes') {
-          totalRisk -= 10;
-          indicators.push({ text: 'Прогрессивная шкала неустойки', color: 'green' });
+        // 7. Прогрессивная шкала — влияет только если процент выше 0,1%
+        if (aboveStandard) {
+          if (progressive === 'yes') {
+            totalRisk -= 10;
+            indicators.push({ text: 'Прогрессивная шкала неустойки (снижает риск)', color: 'green' });
+          } else {
+            totalRisk += 10;
+            indicators.push({ text: 'Нет прогрессивной шкалы при повышенном проценте (риск выше)', color: 'yellow' });
+          }
         } else {
-          totalRisk += 10;
-          indicators.push({ text: 'Нет прогрессивной шкалы', color: 'yellow' });
+          // При 0,1% прогрессивная шкала не нужна — просто показываем нейтральный статус
+          if (progressive === 'yes') {
+            indicators.push({ text: 'Прогрессивная шкала (при 0,1% не влияет на риск)', color: 'green' });
+          } else {
+            indicators.push({ text: 'Прогрессивная шкала (при 0,1% не требуется)', color: 'green' });
+          }
         }
 
-        totalRisk = Math.max(0, Math.min(100, totalRisk));
+        totalRisk = clampRisk(totalRisk);
 
         let riskCategory, badgeClass;
         if (totalRisk <= 30) {
