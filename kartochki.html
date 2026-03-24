@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Игра: Найди причину отмены решения</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 800px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 48px;
+      padding: 2.5rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 450;
+      color: #13294B;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .subhead {
+      text-align: center;
+      color: #4a5a6a;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .case-card {
+      background: #f0f5fc;
+      border-radius: 32px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-left: 8px solid #1E4A7A;
+    }
+
+    .case-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #13294B;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .case-text {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      background: white;
+      padding: 1rem;
+      border-radius: 20px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option {
+      background: white;
+      border: 2px solid #c0d0e0;
+      border-radius: 40px;
+      padding: 0.8rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      color: #13294B;
+    }
+
+    .option:hover {
+      border-color: #1E4A7A;
+      background: #e3edf9;
+      transform: translateX(5px);
+    }
+
+    .option.selected {
+      background: #d4e4fa;
+      border-color: #1E4A7A;
+      box-shadow: 0 2px 8px rgba(0, 77, 153, 0.2);
+    }
+
+    .option.correct-answer {
+      background: #d4edda;
+      border-color: #2E7D32;
+    }
+
+    .option.wrong-answer {
+      background: #f8d7da;
+      border-color: #C62828;
+    }
+
+    .feedback {
+      background: #e8f0fe;
+      border-radius: 24px;
+      padding: 1rem 1.2rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border-left: 4px solid #1E4A7A;
+    }
+
+    .feedback.error {
+      background: #ffe8e8;
+      border-left-color: #C62828;
+    }
+
+    .feedback.success {
+      background: #e0f2e0;
+      border-left-color: #2E7D32;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .nav-btn {
+      background: #1E4A7A;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: #13294B;
+    }
+
+    .nav-btn:disabled {
+      background: #a0b0c0;
+      cursor: not-allowed;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 2px solid #1E4A7A;
+      color: #13294B;
+    }
+
+    .reset-btn:hover {
+      background: #1E4A7A;
+      color: white;
+    }
+
+    .score {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #c0d0e0;
+      font-weight: 600;
+      color: #13294B;
+    }
+
+    .result-message {
+      text-align: center;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 30px;
+      font-weight: 500;
+    }
+
+    .final-success {
+      background: #e0f2e0;
+      color: #2E7D32;
+    }
+
+    .final-fail {
+      background: #ffe8e8;
+      color: #C62828;
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 1.5rem; }
+      .case-card { padding: 1.2rem; }
+      .option { font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎴 Найди причину отмены</h1>
+    <div class="subhead">Кассация отменила решение о снижении неустойки. Укажите причину.</div>
+
+    <div id="gameContainer">
+      <div class="case-card" id="caseCard">
+        <div class="case-title">
+          <span>📋 Дело</span>
+          <span id="caseNumber">1/4</span>
+        </div>
+        <div class="case-text" id="caseText"></div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="feedback" id="feedbackArea"></div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn reset-btn" id="resetBtn">↺ Сбросить</button>
+        <button class="nav-btn" id="nextBtn" disabled>Далее →</button>
+      </div>
+      <div class="score" id="scoreDisplay">Правильных ответов: 0/4</div>
+      <div id="resultMessage" class="result-message"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Кейсы
+      const cases = [
+        {
+          id: 1,
+          text: 'Суд снизил неустойку с 1% до 0,1%, сославшись только на то, что «неустойка явно несоразмерна». Других обоснований в решении нет.',
+          correctId: 'motivation',
+          options: [
+            { id: 'own', text: 'Суд снизил неустойку по собственной инициативе, хотя ответчик не заявлял о снижении' },
+            { id: 'motivation', text: 'Суд не мотивировал снижение (п. 73 Пленума № 7)' },
+            { id: 'burden', text: 'Суд неверно распределил бремя доказывания' },
+            { id: 'rate', text: 'Суд снизил неустойку ниже однократной ставки ЦБ без исключительных обстоятельств' }
+          ],
+          explanation: 'Суд обязан мотивировать снижение: указать, в чем выражается несоразмерность и почему снижение произведено именно до этого размера. Простое указание на «явную несоразмерность» недопустимо (п. 73 Пленума ВС № 7, определение ВС от 08.02.2024 № А40-181975/2022).'
+        },
+        {
+          id: 2,
+          text: 'Ответчик — крупная строительная компания. В отзыве на иск не просил снизить неустойку, но суд все равно уменьшил её на 50%.',
+          correctId: 'own',
+          options: [
+            { id: 'own', text: 'Суд снизил неустойку по собственной инициативе, хотя ответчик не заявлял о снижении' },
+            { id: 'motivation', text: 'Суд не мотивировал снижение (п. 73 Пленума № 7)' },
+            { id: 'burden', text: 'Суд неверно распределил бремя доказывания' },
+            { id: 'rate', text: 'Суд снизил неустойку ниже однократной ставки ЦБ без исключительных обстоятельств' }
+          ],
+          explanation: 'Для коммерческих организаций снижение неустойки допускается только по заявлению должника (п. 71 Пленума ВС № 7). Суд не вправе снижать неустойку по собственной инициативе.'
+        },
+        {
+          id: 3,
+          text: 'Суд снизил неустойку с 0,5% до 0,01% (ниже однократной ставки ЦБ), сославшись на «тяжелое финансовое положение» ответчика. Иных обстоятельств не установил.',
+          correctId: 'rate',
+          options: [
+            { id: 'own', text: 'Суд снизил неустойку по собственной инициативе, хотя ответчик не заявлял о снижении' },
+            { id: 'motivation', text: 'Суд не мотивировал снижение (п. 73 Пленума № 7)' },
+            { id: 'burden', text: 'Суд неверно распределил бремя доказывания' },
+            { id: 'rate', text: 'Суд снизил неустойку ниже однократной ставки ЦБ без исключительных обстоятельств' }
+          ],
+          explanation: 'Снижение неустойки ниже однократной ставки ЦБ допускается только в экстраординарных случаях (постановление АС Московского округа от 24.11.2025 № А41-96007/2024). «Тяжелое финансовое положение» само по себе таким основанием не является.'
+        },
+        {
+          id: 4,
+          text: 'Ответчик заявил о снижении неустойки, но не представил ни одного доказательства несоразмерности. Суд все равно уменьшил её в 3 раза.',
+          correctId: 'burden',
+          options: [
+            { id: 'own', text: 'Суд снизил неустойку по собственной инициативе, хотя ответчик не заявлял о снижении' },
+            { id: 'motivation', text: 'Суд не мотивировал снижение (п. 73 Пленума № 7)' },
+            { id: 'burden', text: 'Суд неверно распределил бремя доказывания' },
+            { id: 'rate', text: 'Суд снизил неустойку ниже однократной ставки ЦБ без исключительных обстоятельств' }
+          ],
+          explanation: 'Бремя доказывания несоразмерности неустойки лежит на ответчике (п. 73 Пленума ВС № 7). Суд не может снизить неустойку только на основании заявления, без доказательств.'
+        }
+      ];
+
+      let currentIndex = 0;
+      let userAnswers = new Array(cases.length).fill(null);
+      let score = 0;
+      let answered = new Array(cases.length).fill(false);
+
+      const caseNumberSpan = document.getElementById('caseNumber');
+      const caseText = document.getElementById('caseText');
+      const optionsContainer = document.getElementById('optionsContainer');
+      const feedbackArea = document.getElementById('feedbackArea');
+      const nextBtn = document.getElementById('nextBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const resultMessageDiv = document.getElementById('resultMessage');
+
+      function updateScore() {
+        score = userAnswers.filter((ans, idx) => ans === cases[idx].correctId).length;
+        scoreDisplay.textContent = `Правильных ответов: ${score}/${cases.length}`;
+      }
+
+      function renderCurrentCase() {
+        const currentCase = cases[currentIndex];
+        caseNumberSpan.textContent = `${currentIndex + 1}/${cases.length}`;
+        caseText.textContent = currentCase.text;
+
+        let optionsHtml = '';
+        currentCase.options.forEach(opt => {
+          const isSelected = userAnswers[currentIndex] === opt.id;
+          optionsHtml += `
+            <div class="option ${isSelected ? 'selected' : ''}" data-opt-id="${opt.id}">
+              ${opt.text}
+            </div>
+          `;
+        });
+        optionsContainer.innerHTML = optionsHtml;
+
+        // Добавляем обработчики на варианты
+        document.querySelectorAll('.option').forEach(optDiv => {
+          optDiv.addEventListener('click', () => handleOptionClick(optDiv));
+        });
+
+        // Если уже был выбран ответ, показываем фидбек
+        if (answered[currentIndex]) {
+          const selectedId = userAnswers[currentIndex];
+          const isCorrect = selectedId === currentCase.correctId;
+          const correctOptionText = currentCase.options.find(o => o.id === currentCase.correctId).text;
+          
+          feedbackArea.innerHTML = `
+            <div class="feedback ${isCorrect ? 'success' : 'error'}">
+              <strong>${isCorrect ? '✅ Верно!' : '❌ Неверно'}</strong><br>
+              ${currentCase.explanation}<br><br>
+              <strong>Правильный ответ:</strong> ${correctOptionText}
+            </div>
+          `;
+          
+          // Подсвечиваем правильный и выбранный варианты
+          document.querySelectorAll('.option').forEach(el => {
+            const optId = el.getAttribute('data-opt-id');
+            if (optId === currentCase.correctId) {
+              el.classList.add('correct-answer');
+            }
+            if (optId === selectedId && optId !== currentCase.correctId) {
+              el.classList.add('wrong-answer');
+            }
+          });
+        } else {
+          feedbackArea.innerHTML = '';
+        }
+
+        // Обновляем кнопку "Далее"
+        if (answered[currentIndex]) {
+          nextBtn.disabled = false;
+        } else {
+          nextBtn.disabled = true;
+        }
+      }
+
+      function handleOptionClick(optDiv) {
+        if (answered[currentIndex]) return; // Уже ответили
+
+        const selectedId = optDiv.getAttribute('data-opt-id');
+        const currentCase = cases[currentIndex];
+        
+        userAnswers[currentIndex] = selectedId;
+        answered[currentIndex] = true;
+        
+        const isCorrect = selectedId === currentCase.correctId;
+        
+        // Обновляем визуал
+        const allOptions = document.querySelectorAll('.option');
+        allOptions.forEach(el => {
+          const optId = el.getAttribute('data-opt-id');
+          if (optId === currentCase.correctId) {
+            el.classList.add('correct-answer');
+          }
+          if (optId === selectedId && optId !== currentCase.correctId) {
+            el.classList.add('wrong-answer');
+          }
+        });
+        
+        const correctOptionText = currentCase.options.find(o => o.id === currentCase.correctId).text;
+        
+        feedbackArea.innerHTML = `
+          <div class="feedback ${isCorrect ? 'success' : 'error'}">
+            <strong>${isCorrect ? '✅ Верно!' : '❌ Неверно'}</strong><br>
+            ${currentCase.explanation}<br><br>
+            <strong>Правильный ответ:</strong> ${correctOptionText}
+          </div>
+        `;
+        
+        updateScore();
+        nextBtn.disabled = false;
+        
+        // Показываем итоговый результат, если это последний кейс
+        if (currentIndex === cases.length - 1) {
+          showFinalResult();
+        }
+      }
+
+      function showFinalResult() {
+        const totalCorrect = userAnswers.filter((ans, idx) => ans === cases[idx].correctId).length;
+        if (totalCorrect === cases.length) {
+          resultMessageDiv.innerHTML = '<div class="final-success">🏆 Отлично! Вы нашли все причины.</div>';
+        } else {
+          resultMessageDiv.innerHTML = `<div class="final-fail">📌 Вы нашли ${totalCorrect} из ${cases.length} причин. Попробуйте пройти игру еще раз, чтобы закрепить материал.</div>`;
+        }
+      }
+
+      function nextCase() {
+        if (currentIndex < cases.length - 1) {
+          currentIndex++;
+          renderCurrentCase();
+        } else if (currentIndex === cases.length - 1) {
+          // На последнем кейсе кнопка "Далее" переключается на финальное сообщение
+          nextBtn.disabled = true;
+          showFinalResult();
+        }
+      }
+
+      function resetGame() {
+        currentIndex = 0;
+        userAnswers = new Array(cases.length).fill(null);
+        answered = new Array(cases.length).fill(false);
+        updateScore();
+        resultMessageDiv.innerHTML = '';
+        renderCurrentCase();
+      }
+
+      nextBtn.addEventListener('click', nextCase);
+      resetBtn.addEventListener('click', resetGame);
+
+      // Инициализация
+      renderCurrentCase();
+    })();
+  </script>
+</body>
+</html>
