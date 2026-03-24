@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажер: основания для отмены в кассации</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #e2e9f0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      max-width: 1000px;
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 48px;
+      padding: 2.5rem;
+      box-shadow: 0 35px 55px -20px rgba(26, 67, 113, 0.3);
+      border: 1px solid rgba(0, 105, 180, 0.2);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 450;
+      color: #13294B;
+      border-bottom: 2px solid #1E4A7A;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .instruction {
+      background: #f0f5fc;
+      border-radius: 30px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 6px solid #1E4A7A;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .instruction p {
+      margin: 0.3rem 0;
+    }
+
+    .text-container {
+      background: #fefefe;
+      border: 1px solid #d0e0ec;
+      border-radius: 24px;
+      padding: 2rem;
+      max-height: 500px;
+      overflow-y: auto;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #13294B;
+    }
+
+    .text-container p {
+      margin-bottom: 1.2rem;
+    }
+
+    .clickable {
+      background-color: #e8f0fe;
+      border-bottom: 2px dashed #1E4A7A;
+      cursor: pointer;
+      transition: all 0.1s;
+      padding: 0 2px;
+      border-radius: 8px;
+    }
+
+    .clickable:hover {
+      background-color: #d4e4fa;
+      transform: translateY(-1px);
+    }
+
+    .tooltip-box {
+      margin-top: 2rem;
+      padding: 1.2rem 1.8rem;
+      background: #f0f5fc;
+      border-radius: 30px;
+      border-left: 6px solid #1E4A7A;
+      transition: all 0.2s;
+    }
+
+    .tooltip-title {
+      font-weight: 700;
+      color: #13294B;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .tooltip-text {
+      color: #2c3e50;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .tooltip-empty {
+      color: #4a5a6a;
+      font-style: italic;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #7a8a9a;
+      text-align: center;
+      border-top: 1px dashed #c0d0e0;
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📖 Тренажер: основания для отмены в кассации</h1>
+
+    <div class="instruction">
+      <p>🎯 <strong>Кликните</strong> на выделенные фрагменты текста — узнаете, почему кассация отменила решение нижестоящих судов.</p>
+      <p>В постановлении три ключевых основания. Нажмите на каждое, чтобы прочитать пояснение.</p>
+    </div>
+
+    <div class="text-container" id="textContainer">
+      <p>...при рассмотрении настоящего дела <span class="clickable" data-info="bremya">суды фактически освободили ответчика от бремени доказывания несоразмерности неустойки</span> в соответствии с нормами пунктов 1 и 2 статьи 333 Гражданского кодекса Российской Федерации, ограничившись лишь самим заявлением ответчика о применении указанной статьи кодекса.</p>
+      <p>Произвольное снижение судами размера подлежащей взысканию договорной неустойки со ссылкой на положения статьи 333 Гражданского кодекса Российской Федерации является недопустимым.</p>
+      <p>...суды не установили необходимые обстоятельства, имеющие значение для правильного применения норм статьи 333 Гражданского кодекса Российской Федерации, в частности <span class="clickable" data-info="neobosnovano">не установлено, в чем именно состоит исключительность рассматриваемого случая для снижения договорной неустойки</span>, <span class="clickable" data-info="stavka">не приведены мотивы, обосновывающие возможность снижения размера договорной неустойки в несколько раз ниже однократной ключевой ставки Банка России</span>, и не обосновано, почему просрочка арендатора, превышающая в несколько раз установленный договором срок внесения арендной платы, является незначительной.</p>
+      <p>...суды не указали, какое именно событие признано судами исключительным и свидетельствующим о явной несоразмерности предусмотренной договором неустойки последствиям нарушения арендатором своего обязательства, а также не указали, какие именно представленные ответчиком доказательства, подтверждают факт того, что в рассматриваемом случае начисленная истцом неустойка привела к получению арендодателем необоснованной выгоды.</p>
+      <p>...<span class="clickable" data-info="stavka2">суды не обосновали необходимость в данном случае снижение размера договорной неустойки ниже действующей однократной ключевой ставки Банка России</span>.</p>
+    </div>
+
+    <div class="tooltip-box" id="tooltipBox">
+      <div class="tooltip-title">📌 Пояснение</div>
+      <div class="tooltip-text tooltip-empty">Нажмите на любой выделенный фрагмент, чтобы увидеть пояснение.</div>
+    </div>
+
+    <div class="footer">
+      Основания из постановления Арбитражного суда Московского округа от 03.12.2025 № А40-19003/25
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const tooltipBox = document.getElementById('tooltipBox');
+      
+      // База пояснений для каждого основания
+      const explanations = {
+        bremya: {
+          title: '⚖️ Нарушение распределения бремени доказывания',
+          text: 'Кассация указала, что суды первой и апелляционной инстанций фактически освободили ответчика от обязанности доказывать несоразмерность неустойки, ограничившись лишь самим заявлением. Это прямое нарушение п. 73 Постановления Пленума ВС № 7, согласно которому бремя доказывания несоразмерности лежит на должнике.'
+        },
+        neobosnovano: {
+          title: '❓ Суды не обосновали, почему неустойка несоразмерна',
+          text: 'Кассация отметила, что нижестоящие суды не установили, в чем именно состоит исключительность случая для снижения неустойки, и не указали, какие доказательства подтверждают несоразмерность. Простое указание на «явную несоразмерность» без конкретного обоснования недопустимо.'
+        },
+        stavka: {
+          title: '📉 Снижение ниже однократной ставки ЦБ без обоснования',
+          text: 'Суды не привели мотивы, почему снизили неустойку в несколько раз ниже однократной ключевой ставки Банка России. Такое снижение допускается только в экстраординарных случаях, но суды не объяснили, почему этот случай — исключительный.'
+        },
+        stavka2: {
+          title: '📉 Снижение ниже однократной ставки ЦБ без обоснования',
+          text: 'Кассация подчеркнула, что снижение неустойки ниже однократной ключевой ставки требует отдельного обоснования. Суды этого не сделали, что стало самостоятельным основанием для отмены.'
+        }
+      };
+
+      // Находим все кликабельные элементы
+      const clickableSpans = document.querySelectorAll('.clickable');
+      
+      function showExplanation(infoKey) {
+        const exp = explanations[infoKey];
+        if (!exp) return;
+        
+        tooltipBox.innerHTML = `
+          <div class="tooltip-title">📌 ${exp.title}</div>
+          <div class="tooltip-text">${exp.text}</div>
+        `;
+      }
+      
+      // Добавляем обработчики
+      clickableSpans.forEach(span => {
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const infoKey = span.getAttribute('data-info');
+          showExplanation(infoKey);
+          
+          // Небольшая визуальная обратная связь
+          span.style.backgroundColor = '#ffd966';
+          setTimeout(() => {
+            span.style.backgroundColor = '';
+          }, 200);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
